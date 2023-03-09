@@ -12,21 +12,7 @@ import {filterImageFromURL} from './util/util';
   
   // Use the body parser middleware for post requests
   app.use(bodyParser.json());
-  app.get("/filteredimage/", async (req, res) =>{
-    try{
-      let {image_url} = req.query;
-      if(!image_url){
-        return res.status(400).send("cannot execute the request!");
-      }
-      console.log(image_url);
-      const path = await filterImageFromURL(image_url);
-      res.sendFile(path);
-      res.on('finish', () => deleteLocalFiles([path]));
-    } catch {
-      return res.status(200).send("done!");
-    }
-    });
-
+  
   // @TODO1 IMPLEMENT A RESTFUL ENDPOINT
   // GET /filteredimage?image_url={{URL}}
   // endpoint to filter an image from a public url.
@@ -51,6 +37,33 @@ import {filterImageFromURL} from './util/util';
     res.send("try GET /filteredimage?image_url={{}}")
   } );
   
+  app.get( "/filteredimage", async (req, res) => {
+    //passing the url
+    const image_url: any = req.query.image_url;
+    
+    //1. construct a regex to check if the url is public and its with image file
+    const url_regex = new RegExp(/([a-z]+\:\/+)([^\/\s]+)([a-z0-9\-@\^=%&;\/~\+])[\?]?([^ \#\r\n])#?([^ \#\r\n]*)\.(?:jpeg|jpg|gif|png|svg|bpm|tiff)/ig);
+    const is_Valid_url = url_regex.test(image_url);
+    
+    // testing the validation of the url with regex
+    if (!is_Valid_url) {
+      res.status(400).send(`${image_url}!, invalid image url`);
+    }
+    try {
+      //2.  calling the filterImageFromUrl function to validate the image
+      const filter_image_file: string = await filterImageFromURL(image_url);
+      
+      //3.  sending the resulting file from filterImageFromUrl function
+      res.status(200).sendFile(filter_image_file);
+      
+      //4. Deleting the file from the local tmp/filtered directory
+      res.on('finish', () => deleteLocalFiles([filter_image_file]));
+    } 
+    // Catch error from 2,3 & 4
+    catch(error) {
+      return res.status(500).send(`${image_url} format not supported! Supported formats are: jpg, png, bmp, tiff, or gif`);
+    }
+  });
 
   // Start the Server
   app.listen( port, () => {
@@ -58,7 +71,6 @@ import {filterImageFromURL} from './util/util';
       console.log( `press CTRL+C to stop server` );
   } );
 })();
-
-function deleteLocalFiles(arg0: string[]): void {
+function deleteLocalFiles(arg0: string[]) {
   throw new Error('Function not implemented.');
 }
