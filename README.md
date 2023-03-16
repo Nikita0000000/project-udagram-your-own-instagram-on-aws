@@ -50,6 +50,6 @@ Add your own domain name and have it point to the running services (try adding a
 
 ### Project Links
 
-Endpoint URL to the Elastic Beanstalk deployment: <http://image-filter-starter-code-dev2222222.us-east-1.elasticbeanstalk.com/>
+Endpoint URL to the Elastic Beanstalk deployment: <http://image-filter-starter-code-dev22.us-east-1.elasticbeanstalk.com/>
 
-Git Repository: <http://>
+Git Repository: <https://github.com/Nikita0000000/project-udagram-your-own-instagram-on-aws.git>

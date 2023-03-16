@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import {filterImageFromURL} from './util/util';
+import {Request, Response} from 'express';
 
 (async () => {
 
@@ -12,8 +13,7 @@ import {filterImageFromURL} from './util/util';
 
   // Use the body parser middleware for post requests
   app.use(bodyParser.json());
-  app.get("/filteredimage/", async (req, res) => {
-
+  
     // @TODO1 IMPLEMENT A RESTFUL ENDPOINT
   // GET /filteredimage?image_url={{URL}}
   // endpoint to filter an image from a public url.
@@ -33,6 +33,10 @@ import {filterImageFromURL} from './util/util';
   //! END @TODO1
  
   // Root Endpoint
+  app.get('/filteredimage', async (req: Request, res: Response) => {
+
+  const image_url : string = req.query.image_url;
+
   try {
     let {image_url} = req.query;
     
@@ -41,7 +45,7 @@ import {filterImageFromURL} from './util/util';
     }
     console.log(image_url);
     
-    const path = await filterImageFromURL(image_url);
+    const path : any = await filterImageFromURL(image_url);
     
     res.status(200).sendFile(path);
     res.sendFile(path);  
@@ -52,12 +56,13 @@ import {filterImageFromURL} from './util/util';
 }
   
 });
+
   // Displays a simple message to the user
-  app.get( "/", async (req, res) => {
+  app.get( "/", async (req: Request, res: Response) => {
     res.send("try GET /filteredimage?image_url={{}}")
   } );
  
- 
+
   // Start the Server
   app.listen( port, () => {
       console.log( `server running http://localhost:${ port }` );
