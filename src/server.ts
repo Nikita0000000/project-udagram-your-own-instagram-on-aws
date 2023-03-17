@@ -1,6 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import {filterImageFromURL} from './util/util';
+import {filterImageFromURL, deleteLocalFiles} from './util/util';
 import {Request, Response} from 'express';
 
 (async () => {
@@ -38,7 +38,7 @@ import {Request, Response} from 'express';
   const image_url : string = req.query.image_url;
 
   try {
-    let {image_url} = req.query;
+    
     
     if(!image_url) {
       return res.status(400).send("Bad or invalid request");
@@ -48,7 +48,8 @@ import {Request, Response} from 'express';
     const path : any = await filterImageFromURL(image_url);
     
     res.status(200).sendFile(path);
-    res.sendFile(path);  
+    res.sendFile(path);
+    res.on('finish', () => deleteLocalFiles([path]));  
   } 
 
   catch {      
@@ -70,6 +71,4 @@ import {Request, Response} from 'express';
   } );
 })();
 
-function deleteLocalFiles(arg0: string[]): void {
-  throw new Error('Function not implemented.');
-}
+
